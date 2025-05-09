@@ -1,0 +1,105 @@
+name: Terraform CD with Approval
+
+on:
+  repository_dispatch:
+    types: [config-updated]
+    run-name: Workflow execution for Client
+
+jobs:
+  terraform-plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Change to root TF directory
+        run: cd confluentcloud-resource-provisioner-tf
+
+      - name: Install Terraform CLI
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8 # Change to your preferred version
+
+      - name: Download Changed Config Files
+        working-directory: confluentcloud-resource-provisioner-tf
+        run: |
+          echo "Fetching all changed files from cc-client-config-repo..."
+
+          CHANGED_FILES_JSON='${{ toJson(github.event.client_payload.changed_files) }}'
+
+          echo "Raw changed files JSON: $CHANGED_FILES_JSON"
+
+          echo "$CHANGED_FILES_JSON" | jq -r '.[]' | while read FILE; do
+            CLIENT=$(echo "$FILE" | cut -d'/' -f2)
+            echo "Found client: $CLIENT"
+            echo "$CLIENT" >> clients.txt
+
+            echo "Downloading file: $FILE"
+            
+            # Remove 'dev/' prefix if needed
+            # TARGET_FILE=${FILE#dev/}
+
+            # Figure out local path
+            LOCAL_PATH="$FILE"
+            
+            DOWNLOAD_URL="https://raw.githubusercontent.com/sasidaren-coder/cc-client-config-repo/main/$FILE"
+
+            echo "Download URL: $DOWNLOAD_URL"
+
+            # Create destination directory
+            mkdir -p "$(dirname "$LOCAL_PATH")"
+
+            # Download the file
+            curl -sSL -H "Authorization: token ${{ secrets.REPO_ACCESS_TOKEN }}" \
+                -H "Accept: application/vnd.github.v3.raw" \
+                -o "$LOCAL_PATH" \
+                "https://raw.githubusercontent.com/sasidaren-coder/cc-client-config-repo/main/$FILE"
+            
+            echo "Downloaded to $(pwd)/$LOCAL_PATH"
+          done
+          echo "clients=$(paste -sd "," clients.txt)" >> $GITHUB_ENV
+
+      - name: Navigate to Terraform root
+        working-directory: confluentcloud-resource-provisioner-tf
+        run: |
+          terraform init
+          terraform plan -var-file="env/dev.terraform.tfvars" -var-file="configs/client1/client1-dev.json" -out tfplan
+          
+      - name: Upload Terraform Plan Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: confluentcloud-resource-provisioner-tf/tfplan
+
+  terraform-apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    needs: terraform-plan
+    environment:
+      name: poc
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Terraform CLI
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8 # Change to your preferred version
+      
+      - name: Download terraform plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan
+          path: confluentcloud-resource-provisioner-tf/
+
+      - name: Change to root TF directory
+        run: cd confluentcloud-resource-provisioner-tf
+
+      - name: Terraform Apply
+        working-directory: confluentcloud-resource-provisioner-tf
+        run: |
+          terraform init
+          terraform apply -auto-approve tfplan
+      
