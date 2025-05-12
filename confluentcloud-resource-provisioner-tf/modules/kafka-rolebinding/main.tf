@@ -1,3 +1,10 @@
+terraform {
+  required_providers {
+    confluent = {
+      source  = "confluentinc/confluent"
+    }
+  }
+}
 resource "confluent_role_binding" "this" {
   for_each = {
     for rb in var.role_bindings : "${rb.principal}_${rb.role_name}_${rb.resource_type}_${rb.resource_name}" => rb
