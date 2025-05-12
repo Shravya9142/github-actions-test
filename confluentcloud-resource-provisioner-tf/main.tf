@@ -55,7 +55,10 @@ module "rolebindings" {
     confluent = confluent.cc
   }
 
-  role_bindings    = local.resource_config.rolebindings
-  kafka_cluster_id = var.kafka_cluster_id
+  role_bindings      = local.resource_config.rolebindings
+  kafka_cluster_id   = var.kafka_cluster_id
+  cc_environment_id  = var.cc_environment_id
+  org_id             = var.org_id
 }
+
 

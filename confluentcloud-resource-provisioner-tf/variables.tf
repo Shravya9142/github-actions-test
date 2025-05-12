@@ -51,3 +51,8 @@ variable "resource_yaml_path" {
 #   }))
 # }
 
+variable "org_id" {
+  type = string
+}
+
+

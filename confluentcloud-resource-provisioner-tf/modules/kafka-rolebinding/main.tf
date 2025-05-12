@@ -6,18 +6,11 @@ terraform {
   }
 }
 resource "confluent_role_binding" "this" {
-  for_each = {
-    for rb in var.role_bindings : "${rb.principal}_${rb.role_name}_${rb.resource_type}_${rb.resource_name}" => rb
-  }
+  for_each = { for rb in var.role_bindings : "${rb.principal}-${rb.role_name}-${rb.resource_name}" => rb }
 
-  principal      = each.value.principal
-  role_name      = each.value.role_name
-  resource_type  = each.value.resource_type
-  resource_name  = each.value.resource_name
-  crn_pattern    = each.value.crn_pattern
-  kafka_cluster  = var.kafka_cluster_id != "" ? var.kafka_cluster_id : null
+  principal  = each.value.principal
+  role_name  = each.value.role_name
 
-  lifecycle {
-    prevent_destroy = false
-  }
+  crn_pattern = "crn://confluent.cloud/organization=${var.org_id}/environment=${var.cc_environment_id}/kafka=${var.kafka_cluster_id}/${lower(each.value.resource_type)}=${each.value.resource_name}"
 }
+
