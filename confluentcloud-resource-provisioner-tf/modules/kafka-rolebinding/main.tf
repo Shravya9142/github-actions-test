@@ -11,6 +11,7 @@ resource "confluent_role_binding" "this" {
   principal  = each.value.principal
   role_name  = each.value.role_name
 
-  crn_pattern = "crn://confluent.cloud/organization=${var.org_id}/environment=${var.cc_environment_id}/kafka=${var.kafka_cluster_id}/${lower(each.value.resource_type)}=${each.value.resource_name}"
+  crn_pattern = "crn://confluent.cloud/organization=${var.org_id}/environment=${var.cc_environment_id}/cloud-cluster=${var.kafka_cluster_id}/kafka=${var.kafka_cluster_id}/${lower(each.value.resource_type)}=${each.value.resource_name}"
+  
 }
 
