@@ -47,3 +47,15 @@ module "service_accounts" {
   kafka_cluster_id = var.kafka_cluster_id
   cc_environment_id = var.cc_environment_id
 }
+
+module "rolebindings" {
+  source = "./modules/kafka-rolebindings"
+
+  providers = {
+    confluent = confluent.cc
+  }
+
+  role_bindings    = local.resource_config.rolebindings
+  kafka_cluster_id = var.kafka_cluster_id
+}
+
