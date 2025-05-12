@@ -2,8 +2,6 @@ variable "role_bindings" {
   type = list(object({
     principal      = string
     role_name      = string
-    resource_type  = string
-    resource_name  = string
   }))
 }
 
