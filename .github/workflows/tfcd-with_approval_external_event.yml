@@ -44,7 +44,7 @@ jobs:
             # Figure out local path
             LOCAL_PATH="$FILE"
             
-            DOWNLOAD_URL="https://raw.githubusercontent.com/sasidaren-coder/cc-client-config-repo/main/$FILE"
+            DOWNLOAD_URL="https://raw.githubusercontent.com/Shravya9142/cc-client-config-repo/main/$FILE"
 
             echo "Download URL: $DOWNLOAD_URL"
 
@@ -55,7 +55,7 @@ jobs:
             curl -sSL -H "Authorization: token ${{ secrets.REPO_ACCESS_TOKEN }}" \
                 -H "Accept: application/vnd.github.v3.raw" \
                 -o "$LOCAL_PATH" \
-                "https://raw.githubusercontent.com/sasidaren-coder/cc-client-config-repo/main/$FILE"
+                "https://raw.githubusercontent.com/Shravya9142/cc-client-config-repo/main/$FILE"
             
             echo "Downloaded to $(pwd)/$LOCAL_PATH"
           done

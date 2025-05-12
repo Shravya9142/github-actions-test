@@ -67,7 +67,7 @@ jobs:
       - name: Checkout github-actions-test (iac-repo)
         uses: actions/checkout@v3
         with:
-          repository: sasidaren-coder/github-actions-test
+          repository: Shravya9142/github-actions-test
           path: iac
 
       # Run validation script from the iac repo
