@@ -6,7 +6,7 @@ terraform {
   }
 }
 resource "confluent_role_binding" "this" {
-  for_each = { for rb in var.role_bindings : "${rb.principal}-${rb.role_name}-${rb.resource_name}" => rb }
+  for_each = { for rb in var.role_bindings : "${rb.principal}-${rb.role_name}" => rb  }
 
   principal  = each.value.principal
   role_name  = each.value.role_name
