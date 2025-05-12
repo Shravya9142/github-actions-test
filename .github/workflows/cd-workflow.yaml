@@ -63,3 +63,7 @@ jobs:
           terraform apply -auto-approve \
             -var-file=env/dev.terraform.tfvars \
             -var="resource_yaml_path=../../${{ inputs.config_path }}/resources.yaml"
+      - name: Terraform state
+        working-directory: iac/confluentcloud-resource-provisioner-tf
+        run: |
+          terraform state show module.rolebindings.confluent_role_binding.this["User:sa-2vqyvo-EnvironmentAdmin"]
