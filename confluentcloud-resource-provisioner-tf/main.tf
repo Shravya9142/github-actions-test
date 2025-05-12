@@ -49,7 +49,7 @@ module "service_accounts" {
 }
 
 module "rolebindings" {
-  source = "./modules/kafka-rolebindings"
+  source = "./modules/kafka-rolebinding"
 
   providers = {
     confluent = confluent.cc
