@@ -39,3 +39,13 @@ module "service_accounts" {
   kafka_cluster_id = var.kafka_cluster_id
   cc_environment_id = var.cc_environment_id
 }
+
+module "env" {
+  source = "./modules/cc-env"
+
+  providers = {
+    confluent = confluent.cc
+  }
+
+  environment_name = var.environment_name
+}
